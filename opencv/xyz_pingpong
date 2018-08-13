@@ -4,6 +4,8 @@ Created on Mon Aug 13 12:09:40 2018
 
 @author: pland
 """
+
+
 # -*- coding: utf-8 -*-
 """
 Created on Wed Aug  8 15:12:19 2018
@@ -60,7 +62,7 @@ def opencv1():
     lower_orange = np.array([10,100,50])  
     upper_orange = np.array([70,245,250])
     pts = deque(maxlen=args["buffer"])
-    vs = VideoStream(0).start()#수정 src=0을 1로 바꿈
+    vs = VideoStream(1).start()#수정 src=0을 1로 바꿈
     
     # allow the camera or video file to warm up
     time.sleep(2.0)
@@ -74,6 +76,7 @@ def opencv1():
     pastdown = 0
     pastup = 0
     lenrec= 20 #x,z 좌표를 recent에 몇개 저장할 것인가
+    suc = 0
     # keep looping
     while True:
     	# grab the current frame
@@ -211,33 +214,32 @@ def opencv1():
                         check = 0
                     
                 
-            if suc == 3:
+            if suc == 3: #low점과 비슷한 것의 index를 찾을 수 없을 때
                 if y_high - y_low != 0:
                     rz = z_high * (y_low - ry) / (y_high - y_low)
                     lockgz.acquire()
                     gotz = 1                    
                     lockgz.release()
-                    gotzz = 1
+                    
                     suc = 0
                 else:
                     rz = 50#적당한값. 대충 때려맞히기 좋은 값
                     lockgz.acquire()
                     gotz = 1                   
                     lockgz.release() 
-                    gotzz = 1
                     suc = 0
                     print("도전")#대회당일에는 쪽팔리니까 print 뺄 것.
             else:
                 rz = z_history.index(index_)
                 lockgz.acquire()
                 gotz = 1
-                gotzz = 1
                 lockgz.release()
-            while gotzz:
+            while True:
                 if gotz == 0:        #opencv2에서 로봇으로 보내고나면 이걸 0으로 만들것.            
                     timing_h = 0
                     timing_l = 0
-                    gotzz = 0
+            print("한세트 후 gotz(1)바꾸기 성공")
+                
                         
                     
                # - (rx - 탁구대 중앙값)
@@ -260,7 +262,7 @@ def opencv1():
         
     	# show the frame to our screen
         cv2.imshow("Frame", frame)
-    
+        
     
         key = cv2.waitKey(1) & 0xFF
      
@@ -298,12 +300,15 @@ def opencv2():
     lower_orange = np.array([15,0,50])  
     upper_orange = np.array([20,255,255])
     pts = deque(maxlen=args["buffer"])
-    vs = VideoStream(1).start()
+    vs = VideoStream(0).start()
     time.sleep(2.0)
+    goth = 0
+    gotl = 0
 #    x_history = [] #경향성 체크
- #   y_history = [] #경향성 체크
-  #  x_recent = []
-   
+ #   y_history = [] #경향성 체
+    x_recent = []
+    hh = 0
+    ll = 0
    # x_tend2 = [] #레일이 미리 이동해두기 위함. 추가 필요
     #testh = 0 # 테스트용.
     #testl = 0
@@ -372,11 +377,11 @@ def opencv2():
         
     	# update the points queue
         pts.appendleft(center)
-#        x_recent.append(x_coor2)
+        x_recent.append(x_coor2)
 #        
 #        
-#        if (len(x_recent) > lenrec):
-#            del x_recent[0]        
+        if (len(x_recent) > lenrec):
+            del x_recent[0]        
 #        
 #        if len(x_recent) == lenrec:
 #            right = 0
@@ -391,36 +396,52 @@ def opencv2():
 #                    equ += 1            
                     
         #최고, 최저점에 다다랐을때의 x,y를 저장.
-        hh = timing_h 
+        if timing_h == 1 and goth == 0:
+            hh = 1
+            time.sleep(0.001)
+        if timing_l == 1 and gotl == 0:
+            ll = 1
+            time.sleep(0.001)
         if hh == 1:
             xh = (x_coor2)
             yh = (y_coor2)
-            
-        ll = timing_l
-        if (hh == 1) and (ll == 1):
+            goth = 1
+            hh = 0
+        if ll == 1:
             xl = x_coor2
             yl = y_coor2
-            hh=0
-            ll=0
+            gotl  = 1
+            ll = 0
+        if (goth == 1) and (gotl == 1):
+         
             if (yh-yl) != 0:
                 rx = xl - ((yh-ry)*(xh-xl))/(yh-yl)
         #        rz = zh * (yl - ry) / (yh - yl)
                 # - (rx - 탁구대 중앙값)
                 # rz 
                 #탁구대 보는 시야 따라서 일반적인 xz 좌표계로 줄 것.
-                
+                print("rx값 획득")
+                print(rx)
+                goth = 0
+                gotl = 0
                 gorob = 1
             else:
-                print("error: yh와 yl이 같습니다.")
-                gorob = 0#여기다가 그냥 x값만 계산해서 긴급-대충때리기 코드 넣으면 더 나을지도
-        if gorob == 1:
-            #여기에 통신 코드를 집어넣고 로봇에게 전달한다.
-            #통신 잘 되면 로봇팔 xz가 비독립적이므로 그부분을 보완한다.
-            lockgz.acquire()
-            gotz = 0
-            lockgz.release()
-            gorob = 0
-            
+                print("error: yh와 yl이 같습니다.(frame2) 제 2안으로 계산하겠습니다.")
+                rx = x_recent [len(x_recent)-1]
+                gorob = 1#여기다가 그냥 x값만 계산해서 긴급-대충때리기 코드 넣으면 더 나을지도
+                goth = 0
+                gotl = 0
+                print(gotz)
+            if gorob == 1 and gotz == 1:
+                #여기에 통신 코드를 집어넣고 로봇에게 전달한다.
+                #통신 잘 되면 로봇팔 xz가 비독립적이므로 그부분을 보완한다.
+                print("로봇으로 전송")
+                lockgz.acquire()
+                gotz = 0
+                lockgz.release()
+                gorob = 0
+                goth = 0
+                gotl = 0
             
         for i in range(1, len(pts)):
     		# if either of the tracked points are None, ignore
