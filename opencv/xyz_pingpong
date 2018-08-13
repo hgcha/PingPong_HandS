@@ -65,7 +65,7 @@ def opencv1():
     vs = VideoStream(1).start()#수정 src=0을 1로 바꿈
     
     # allow the camera or video file to warm up
-    time.sleep(2.0)
+    time.sleep(3.0)
     y_recent = [] #경향성 체크
     z_recent = [] #경향성 체크
     z_history = [] #예측 z값 구하기 위함
@@ -75,7 +75,7 @@ def opencv1():
     testl = 0
     pastdown = 0
     pastup = 0
-    lenrec= 20 #x,z 좌표를 recent에 몇개 저장할 것인가
+    lenrec= 10 #x,z 좌표를 recent에 몇개 저장할 것인가
     suc = 0
     # keep looping
     while True:
@@ -141,7 +141,7 @@ def opencv1():
         
         if (len(y_recent) > lenrec):
             del y_recent[0]
-            
+           
     
             
       #  print("x_history")
@@ -169,7 +169,7 @@ def opencv1():
                     y_low = (y_recent[lpoint])
                     print("lowest")
                     testl += 1 #그냥 잘 돌아가나 세보려고 해둠
-                  
+                    
                     #lock1.acquire()
                     timing_l = 1
                     #lock1.release()
@@ -212,9 +212,13 @@ def opencv1():
                     if ccnt == 15:
                         suc = 3
                         check = 0
-                    
+            if suc != 3:
+                rz = z_history[index_]
+                lockgz.acquire()
+                gotz = 1
+                lockgz.release()                    
                 
-            if suc == 3: #low점과 비슷한 것의 index를 찾을 수 없을 때
+            else: #low점과 비슷한 것의 index를 찾을 수 없을 때
                 if y_high - y_low != 0:
                     rz = z_high * (y_low - ry) / (y_high - y_low)
                     lockgz.acquire()
@@ -229,15 +233,15 @@ def opencv1():
                     lockgz.release() 
                     suc = 0
                     print("도전")#대회당일에는 쪽팔리니까 print 뺄 것.
-            else:
-                rz = z_history.index(index_)
-                lockgz.acquire()
-                gotz = 1
-                lockgz.release()
+
+            print("opencv1, rz출력")
+            print(rz)
             while True:
                 if gotz == 0:        #opencv2에서 로봇으로 보내고나면 이걸 0으로 만들것.            
                     timing_h = 0
                     timing_l = 0
+                    break
+                time.sleep(0.01)
             print("한세트 후 gotz(1)바꾸기 성공")
                 
                         
@@ -301,12 +305,12 @@ def opencv2():
     upper_orange = np.array([20,255,255])
     pts = deque(maxlen=args["buffer"])
     vs = VideoStream(0).start()
-    time.sleep(2.0)
+    time.sleep(3.0)
     goth = 0
     gotl = 0
 #    x_history = [] #경향성 체크
  #   y_history = [] #경향성 체
-    x_recent = []
+   
     hh = 0
     ll = 0
    # x_tend2 = [] #레일이 미리 이동해두기 위함. 추가 필요
@@ -314,7 +318,7 @@ def opencv2():
     #testl = 0
     #pastdown = 0
     #pastup = 0
-    lenrec= 20 #x,z 좌표를 recent에 몇개 저장할 것인가
+
     # define the lower and upper boundaries of the "green"
     # ball in the HSV color space, then initialize the
     # list of tracked points
@@ -377,11 +381,7 @@ def opencv2():
         
     	# update the points queue
         pts.appendleft(center)
-        x_recent.append(x_coor2)
-#        
-#        
-        if (len(x_recent) > lenrec):
-            del x_recent[0]        
+        
 #        
 #        if len(x_recent) == lenrec:
 #            right = 0
@@ -426,22 +426,27 @@ def opencv2():
                 gotl = 0
                 gorob = 1
             else:
-                print("error: yh와 yl이 같습니다.(frame2) 제 2안으로 계산하겠습니다.")
-                rx = x_recent [len(x_recent)-1]
-                gorob = 1#여기다가 그냥 x값만 계산해서 긴급-대충때리기 코드 넣으면 더 나을지도
+                print("error: yh와 yl이 같습니다. (frame2) 제 2안으로 계산하겠습니다.")
+                rx = xh - (xh-xl) * 2 
+                gorob = 1
                 goth = 0
                 gotl = 0
+                print("이건 글로벌 gotz")
                 print(gotz)
-            if gorob == 1 and gotz == 1:
-                #여기에 통신 코드를 집어넣고 로봇에게 전달한다.
-                #통신 잘 되면 로봇팔 xz가 비독립적이므로 그부분을 보완한다.
-                print("로봇으로 전송")
-                lockgz.acquire()
-                gotz = 0
-                lockgz.release()
-                gorob = 0
-                goth = 0
-                gotl = 0
+            while gorob:
+                if gorob == 1 and gotz == 1:
+                    #여기에 통신 코드를 집어넣고 로봇에게 전달한다.
+                    #통신 잘 되면 로봇팔 xz가 비독립적이므로 그부분을 보완한다.
+                    print("opencv2, rx값을 출력")
+                    print(rx)
+                    print("로봇으로 전송")
+                    lockgz.acquire()
+                    gotz = 0
+                    lockgz.release()
+                    gorob = 0
+                    goth = 0
+                    gotl = 0
+
             
         for i in range(1, len(pts)):
     		# if either of the tracked points are None, ignore
