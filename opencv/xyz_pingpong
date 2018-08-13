@@ -6,20 +6,6 @@ Created on Mon Aug 13 12:09:40 2018
 """
 # -*- coding: utf-8 -*-
 """
-Created on Sat Aug 11 17:19:01 2018
-
-@author: pland
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Aug 10 14:56:08 2018
-
-@author: plandat
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Wed Aug  8 15:12:19 2018
 
 @author: pland
@@ -228,23 +214,22 @@ def opencv1():
             if suc == 3:
                 if y_high - y_low != 0:
                     rz = z_high * (y_low - ry) / (y_high - y_low)
-                    lockgz.aquire()
+                    lockgz.acquire()
                     gotz = 1                    
                     lockgz.release()
                     gotzz = 1
                     suc = 0
                 else:
                     rz = 50#적당한값. 대충 때려맞히기 좋은 값
-                    lockgz.aquire()
+                    lockgz.acquire()
                     gotz = 1                   
                     lockgz.release() 
                     gotzz = 1
                     suc = 0
                     print("도전")#대회당일에는 쪽팔리니까 print 뺄 것.
-                    
             else:
                 rz = z_history.index(index_)
-                lockgz.aquire()
+                lockgz.acquire()
                 gotz = 1
                 gotzz = 1
                 lockgz.release()
@@ -431,7 +416,7 @@ def opencv2():
         if gorob == 1:
             #여기에 통신 코드를 집어넣고 로봇에게 전달한다.
             #통신 잘 되면 로봇팔 xz가 비독립적이므로 그부분을 보완한다.
-            lockgz.aquire()
+            lockgz.acquire()
             gotz = 0
             lockgz.release()
             gorob = 0
