@@ -229,16 +229,19 @@ def opencv1():
                 if y_high - y_low != 0:
                     rz = z_high * (y_low - ry) / (y_high - y_low)
                     lockgz.aquire()
-                    gotz = 1
-                    gotzz = 1
+                    gotz = 1                    
                     lockgz.release()
+                    gotzz = 1
+                    suc = 0
                 else:
                     rz = 50#적당한값. 대충 때려맞히기 좋은 값
                     lockgz.aquire()
-                    gotz = 1
+                    gotz = 1                   
+                    lockgz.release() 
                     gotzz = 1
-                    lockgz.release()
+                    suc = 0
                     print("도전")#대회당일에는 쪽팔리니까 print 뺄 것.
+                    
             else:
                 rz = z_history.index(index_)
                 lockgz.aquire()
