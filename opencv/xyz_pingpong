@@ -420,8 +420,6 @@ def opencv2():
                 # - (rx - 탁구대 중앙값)
                 # rz 
                 #탁구대 보는 시야 따라서 일반적인 xz 좌표계로 줄 것.
-                print("rx값 획득")
-                print(rx)
                 goth = 0
                 gotl = 0
                 gorob = 1
@@ -431,8 +429,7 @@ def opencv2():
                 gorob = 1
                 goth = 0
                 gotl = 0
-                print("이건 글로벌 gotz")
-                print(gotz)
+                print("차선의 rx값 획득")
             while gorob:
                 if gorob == 1 and gotz == 1:
                     #여기에 통신 코드를 집어넣고 로봇에게 전달한다.
