@@ -26,7 +26,6 @@ Created on Wed Aug  8 15:12:19 2018
 
 @author: pland
 """
-#혹시나 최고점을 인식하지 못 할 경우 대비하도록  된 것.
 #다시 받아친 공이 인식되는지도 체크 할 것. - > 일단 y값 기준으로 해놨다.
 #만약 highest 안잡히면 탁구대에 일정 환경설정해놓고 센터 잡아서 거기를 기준으로 donrec아닌데 넘어갈때 xyz잡을것.
 #내일 할 일 계산된 x,z가 가능범위를 벗어나면 교정하여 값을 보내기
@@ -93,8 +92,8 @@ def opencv1():
     lenrec= 10 #x,z 좌표를 recent에 몇개 저장할 것인가
     suc = 0
     dontrec = 0 # y가 거꾸로가면 기록을 막는다.
-    sub_h = 0 #네트의 값을 이용해서 최고값이 없을때를 대비한다. 이게 1이되면 sub sol실행
-    net = 10#네트값
+
+    net = 50 #네트값
 
     # keep looping
     while True:
@@ -199,7 +198,7 @@ def opencv1():
                     if (z_recent[i]) == (z_recent[i-1]):
                         equ += 1            
                 #네트를 지나가 버렸을 경우
-                if min(y_history) < net and timing_h == 0:#대체 시작 (net를 지나친 경우)즉, 최저값이 나왔으며 네트뒤에서부터 왔는데 최고값이 없을 때 시작)
+                if max(y_recent) > net and timing_h == 0:#대체 시작 (net를 지나친 경우)즉, 최저값이 나왔으며 네트뒤에서부터 왔는데 최고값이 없을 때 시작)
                     z_high = max(z_history) 
                     subh_in = z_history.index(z_high)
                     y_high = y_history[subh_in]
@@ -330,6 +329,8 @@ def opencv1():
     if not args.get("video", False):
         vs.stop()
      
+        
+        
     # otherwise, release the camera
     else:
         vs.release()
