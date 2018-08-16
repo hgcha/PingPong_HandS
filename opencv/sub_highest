@@ -93,7 +93,7 @@ def opencv1():
     suc = 0
     dontrec = 0 # y가 거꾸로가면 기록을 막는다.
 
-    net = 50 #네트값
+    net = 200 #네트값
 
     # keep looping
     while True:
@@ -206,6 +206,7 @@ def opencv1():
                     timing_h = 1
                     timing_l = 0
                     print("sub_highest")
+                    sub_h = 1
                     
                 if plus > (lenrec - equ)/2 * 1.4 :
                     #nowup
@@ -225,10 +226,10 @@ def opencv1():
                     pastup = 1
                     pastdown = 0
     
-                    
+                
                 if minus > (lenrec - equ)/2 * 1.4 :
                     #nowdown
-                    if pastup == 1:
+                    if pastup == 1 and (sub_h == 0):
                         z_high = max(z_recent)
                         hpoint = z_recent.index(z_high) #최고값의 리스트 위치
                         y_high = (y_recent[hpoint])
@@ -289,6 +290,11 @@ def opencv1():
                 if gotz == 0:        #opencv2에서 로봇으로 보내고나면 이걸 0으로 만들것.            
                     timing_h = 0
                     timing_l = 0
+                    sub_h = 0
+                    y_history = []
+                    z_history = []
+                    y_recent = []
+                    z_recent = []
                     break
                 time.sleep(0.01)
             print("한세트 후 gotz(1)바꾸기 성공")
