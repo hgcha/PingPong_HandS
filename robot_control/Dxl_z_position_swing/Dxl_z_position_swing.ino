@@ -20,7 +20,7 @@
 int z=0;
 int pwm=0;
 int present=0;
-char data[2];
+char data[3];
 int p_data[2];
 
 int get_pwm(int z)

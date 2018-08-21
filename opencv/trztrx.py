@@ -19,6 +19,7 @@ import time
 import threading
 import math
 import serial
+import socket
 
 #def __init__(self):
     
@@ -32,7 +33,22 @@ rz = 50 # 대충 무난한 값. 혹시 모르니까 + z는 어차피 비슷 할 
 gotz = 0
 trz = 0
 
+#로봇과 연결
+robot = serial.Serial('COM6', 9600)
 
+#레일과 연결 
+client = socket.socket()
+HOST = "169.254.7.25"
+PORT = 5003
+BUFSIZE = 1024
+ADDR = (HOST, PORT)
+
+client.connect(ADDR)
+print('Connected to', HOST)
+
+
+#    message = str(input("Enter something for the server: "))
+#    client.send(message.encode('utf-8'))
 def opencv1():#측면 카메라
     
     global timing_h
@@ -275,7 +291,9 @@ def opencv1():#측면 카메라
 
             print("opencv1, trz 전송시작")
             trz = rz * conz - ztrans
+
             #여기에 trz를 아두이노로 보내는 코드가 위치하도록 한다.
+            robot.write(trz)
             while True:
                 if gotz == 0:        #opencv2에서 로봇으로 보내고나면 이걸 0으로 만들것.            
                     timing_h = 0
@@ -343,6 +361,7 @@ def opencv2():#x체크
     global rz
     global gotz #z가 저장되었는지 확인.
     global trz
+    global client
     
     arduino = serial.Serial('COM6', 9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0)
 
@@ -505,7 +524,7 @@ def opencv2():#x체크
                     railx = xcm - robx
                     trx = railx - pastx
                     #
-                    arduino.write(trx.encode())
+                    client.send(message.encode('utf-8'))
                     #
                     pastx = trx
                     print("로봇으로 전송")

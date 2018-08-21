@@ -3,7 +3,7 @@ import wiringpi
 import time
 
 HOST = "169.254.7.25"
-PORT = 5002
+PORT = 5000
 BUFSIZE = 1024
 ADDR = (HOST, PORT)
 
@@ -39,7 +39,7 @@ while True:
 		total_data = total_data.decode()
 		print(total_data)
 		print(type(total_data))
-		total_data = int(total_data)
+		total_data = int(float(total_data))
 
 		if total_data > 0:
 			wiringpi.digitalWrite(DIR, HIGH)
@@ -48,9 +48,7 @@ while True:
 				wiringpi.digitalWrite(STEP, HIGH)
 				time.sleep(0.0005)
 				wiringpi.digitalWrite(STEP, LOW)
-				time.sleep(0.0005)
-
-			time.sleep(0.1)
+				time.sleep(0.0001)
 
 		if total_data < 0:
 			total_data = (-1) * total_data
@@ -60,6 +58,4 @@ while True:
 				wiringpi.digitalWrite(STEP, HIGH)
 				time.sleep(0.0005)
 				wiringpi.digitalWrite(STEP, LOW)
-				time.sleep(0.0005)
-
-			time.sleep(0.1)
+				time.sleep(0.0001)
