@@ -11,17 +11,29 @@ pts = deque(maxlen=args["buffer"])
 
 firstFrame = None
 
+x = [] * 5
+y = [] * 5
+G = [] * 4
+i = 0
+G_total = 0
+G_avg = 0
+
+x_final = -1
+y_final = -1
+
 cap = cv2.VideoCapture(0)
+
+rows = 600
+cols = 800
 
 while True:
 	ret, frame = cap.read()
 
-
 	if ret is False:
 		print("Cam Error")
-
+	frame = cv2.resize(frame, (800, 600))
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-	gray = cv2.GaussianBlur(gray, (11, 11), 0)
+	gray = cv2.GaussianBlur(gray, (31, 31), 0)
 
 	if firstFrame is None:
 		firstFrame = gray
@@ -38,31 +50,85 @@ while True:
 	else:
 		cnts = max(contours, key = lambda x: cv2.contourArea(x))
 		m = cv2.moments(cnts)
-		((x, y), radius) = cv2.minEnclosingCircle(cnts)
+		((xloc, yloc), radius) = cv2.minEnclosingCircle(cnts)
 
 		if m['m00'] > 0:
-			cx = int(m['m10']/m['m00'])
-			cy = int(m['m01']/m['m00'])
+			cx = (m['m10']/m['m00'])
+			cy = (m['m01']/m['m00'])
 
 			center = (cx, cy)
 
 			if radius > 10:
-				cv2.circle(frame, (int(x), int(y)), int(radius), (0,255,0), 2)
-				cv2.circle(frame, center, 5, (0, 255, 0), -1)
+				cv2.circle(frame, (int(xloc), int(yloc)), int(radius), (0,255,0), 2)
+				cv2.circle(frame, (int(cx),int(cy)), 5, (0, 255, 0), -1)
 
-		pts.appendleft(center)
-		print(center)
+			if i < 3:
+				x.append(cx)
+				y.append(cy)
 
-		for i in range(1, len(pts)):
-		# if either of the tracked points are None, ignore
-		# them
-			if pts[i - 1] is None or pts[i] is None:
-				continue
- 
-		# otherwise, compute the thickness of the line and
-		# draw the connecting lines
-			thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
-			cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+			elif i == 3 :
+				if x[0] > x[1] :
+					for t in range(0, 2):
+						G.append(int( (y[t+1] - y[t]) / (x[t+1] - x[t]) ))
+
+					for f in range(0, 2):
+						G_total += G[f]
+
+					G_avg = int(G_total / 4)
+
+					if G_avg < 0:				#down
+						G_compare = int( (rows - y[0]) / (0 - x[0]))
+						if G_compare > G_avg:	#height = frame.rows - y[0]
+							x_final = ( 1 / G_avg ) * (rows - y[0]) + x[0]
+							y_final = rows
+						elif G_compare < G_avg:	#weight = frame.cols
+							x_final = 0
+							y_final = (G_avg) * ( 0 - x[0] ) + y[0]
+						else:
+							x_final = 0
+							y_final = rows
+					elif G_avg > 0:				#up
+						G_compare = int( (rows - y[0]) / (0 - x[0]))
+						if G_compare > G_avg:	#weight = frame.rows - y[0]
+							x_final = 0
+							y_final = ( G_avg ) * ( 0 - x[0] ) + y[0]
+						elif G_compare < G_avg:	#height = y[0]
+							x_final = ( 1 / G_avg ) * (0 - y[0]) + x[0]
+							y_final = 0
+						else:
+							x_final = 0
+							y_final = 0
+					else:
+						x_final = 0
+						y_final = y[0]
+
+					cv2.line(frame, (int(x[0]), int(y[0])), (int(x_final), int(y_final)), (0,0,255), 10 )
+					print(x_final)
+					print(y_final)
+					print("===============")
+
+				else:
+					del x[:]
+					del y[:]
+					del G[:]
+					i = -1
+					G_avg = 0
+					G_compare = 0
+					G_total = 0	
+
+			elif i > 3:
+				if cx <= 30:
+					del x[:]
+					del y[:]
+					del G[:]
+					i = -1
+					G_avg = 0
+					G_compare = 0
+					G_total = 0	
+				else:
+					pass
+
+			i = i + 1
 
 	cv2.imshow("1", frame)
 	key = cv2.waitKey(1)
