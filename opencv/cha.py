@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import argparse
+import socket
+
 from collections import deque
 
 ap = argparse.ArgumentParser()
@@ -9,11 +11,20 @@ ap.add_argument("-b", "--buffer", type=int, default=64, help="max buffer size")
 args = vars(ap.parse_args())
 pts = deque(maxlen=args["buffer"])
 
+client = socket.socket()
+HOST = "192.168.1.105"
+PORT = 5000
+BUFSIZE = 1024
+ADDR = (HOST, PORT)
+
+client.connect(ADDR)
+print('Connected to', HOST)
+
+current_position = 0
 firstFrame = None
 
-x = [] * 5
-y = [] * 5
-G = [] * 4
+x = []
+y = []
 i = 0
 G_total = 0
 G_avg = 0
@@ -21,7 +32,7 @@ G_avg = 0
 x_final = -1
 y_final = -1
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 rows = 600
 cols = 800
@@ -69,15 +80,15 @@ while True:
 			elif i == 3 :
 				if x[0] > x[1] :
 					for t in range(0, 2):
-						G.append(int( (y[t+1] - y[t]) / (x[t+1] - x[t]) ))
+						#G.append(int( (y[t+1] - y[t]) / (x[t+1] - x[t]) ))
+						G_total += int((y[t+1] - y[t]) / (x[t+1] - x[t]))
 
-					for f in range(0, 2):
-						G_total += G[f]
+					#for f in range(0, 2):
+						#G_total += G[f]
 
 					G_avg = int(G_total / 4)
-
+					G_compare = int( (rows - y[0]) / (0 - x[0]))
 					if G_avg < 0:				#down
-						G_compare = int( (rows - y[0]) / (0 - x[0]))
 						if G_compare > G_avg:	#height = frame.rows - y[0]
 							x_final = ( 1 / G_avg ) * (rows - y[0]) + x[0]
 							y_final = rows
@@ -88,7 +99,6 @@ while True:
 							x_final = 0
 							y_final = rows
 					elif G_avg > 0:				#up
-						G_compare = int( (rows - y[0]) / (0 - x[0]))
 						if G_compare > G_avg:	#weight = frame.rows - y[0]
 							x_final = 0
 							y_final = ( G_avg ) * ( 0 - x[0] ) + y[0]
@@ -101,7 +111,13 @@ while True:
 					else:
 						x_final = 0
 						y_final = y[0]
-
+					move_steps =  y_final * (4625/600) - current_position
+					current_position = current_position + move_steps
+					if current_position < 0:
+						current_position = 0
+					if current_position > 4625:
+						current_position = 4625
+					client.send(str(move_steps).encode('utf-8'))
 					cv2.line(frame, (int(x[0]), int(y[0])), (int(x_final), int(y_final)), (0,0,255), 10 )
 					print(x_final)
 					print(y_final)
@@ -110,7 +126,6 @@ while True:
 				else:
 					del x[:]
 					del y[:]
-					del G[:]
 					i = -1
 					G_avg = 0
 					G_compare = 0
@@ -120,7 +135,6 @@ while True:
 				if cx <= 30:
 					del x[:]
 					del y[:]
-					del G[:]
 					i = -1
 					G_avg = 0
 					G_compare = 0
