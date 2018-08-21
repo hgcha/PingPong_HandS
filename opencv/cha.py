@@ -20,7 +20,7 @@ while True:
 	if ret is False:
 		print("Cam Error")
 
-	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	gray = cv2.GaussianBlur(gray, (11, 11), 0)
 
 	if firstFrame is None:
