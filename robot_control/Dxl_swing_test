@@ -1,0 +1,34 @@
+
+/* Serial device defines for dxl bus */
+#define DXL_BUS_SERIAL1 1  //Dynamixel on Serial1(USART1)  <-OpenCM9.04
+#define DXL_BUS_SERIAL2 2  //Dynamixel on Serial2(USART2)  <-LN101,BT210
+#define DXL_BUS_SERIAL3 3  //Dynamixel on Serial3(USART3)  <-OpenCM 485EXP
+/* Dynamixel ID defines */
+#define ID_NUM 4
+/* Control table defines */
+#define GOAL_POSITION 30
+
+
+Dynamixel Dxl(DXL_BUS_SERIAL3);
+
+void setup() {
+  
+  // Dynamixel 2.0 Baudrate -> 0: 9600, 1: 57600, 2: 115200, 3: 1Mbps 
+  Dxl.begin(3);
+  Dxl.jointMode(ID_NUM); //jointMode() is to use position mode
+  Serial.begin(9600);
+}
+
+void loop() {  
+  
+  if (Serial.available())
+  {
+      if (Serial.read()){
+      Dxl.writeWord(ID_NUM, GOAL_POSITION, 300);
+      delay(1000);
+      Dxl.writeWord(ID_NUM, GOAL_POSITION, 512); 
+      delay(1000);         
+    }
+  }
+
+}
