@@ -2,21 +2,24 @@ import cv2
 import numpy as np
 import socket
 import time
+import serial
 
-client = socket.socket()
-#HOST = "169.254.7.25"
-HOST = "192.168.1.105"
-PORT = 5050
-BUFSIZE = 4
-ADDR = (HOST, PORT)
+# client = socket.socket()
+# #HOST = "169.254.7.25"
+# HOST = "192.168.1.105"
+# PORT = 5050
+# BUFSIZE = 4
+# ADDR = (HOST, PORT)
 
-client.connect(ADDR)
-print('Connected to', HOST)
+# client.connect(ADDR)
+# print('Connected to', HOST)
+
+robot = serial.Serial("/dev/ttyACM0", 57600)
 
 current_position = 2325
 firstFrame = None
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while True:
 	ret, frame = cap.read()
@@ -44,17 +47,23 @@ while True:
 		if m['m00'] > 0:
 			cx = int(m['m10']/m['m00'])
 			cy = int(m['m01']/m['m00'])
-			print(cy)
+			#print(cy)
 			cv2.circle(frame, (0, cy), 6, (0,0,255), 10)
 
-			move_steps = int(cy * (4650/600) - current_position)
-			current_position = current_position + (move_steps)
-			if current_position < 0:
-				current_position = 0
-			if current_position > 4650:
-				current_position = 4650
-			move_steps = move_steps + 4650
-			client.send(str(move_steps).encode())
+			if cx in range(10, 20):
+				a = 1
+				robot.write(a)
+			else:
+				a = 0
+				robot.write(a)
+			# move_steps = int(cy * (4650/600) - current_position)
+			# current_position = current_position + (move_steps)
+			# if current_position < 0:
+			# 	current_position = 0
+			# elif current_position > 4650:
+			# 	current_position = 4650
+			# move_steps = move_steps + 4650
+			# client.send(str(move_steps).encode())
 
 	cv2.imshow("2", frame)
 	#cv2.imshow("1", thresh)
