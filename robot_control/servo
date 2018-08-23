@@ -1,0 +1,23 @@
+#include <Servo.h>
+int a;
+Servo servo;
+int value = 100;
+void setup() {
+  servo.attach(6);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (Serial.available()){
+    a = Serial.read();
+    Serial.println(a);
+    if (a == 1){
+      value = 100;
+      }
+    else if (a == 0){
+      value = 30;//
+      }
+    servo.write(value);
+    delay(100);
+    }
+}
