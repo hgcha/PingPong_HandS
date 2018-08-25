@@ -1,0 +1,88 @@
+#include <stdio.h>
+/* Dynamixel Basic Position Control Example
+ 
+ Turns left the dynamixel , then turn right for one second,
+ repeatedly.
+ 
+                   Compatibility
+ CM900                  O
+ OpenCM9.04             O
+ 
+                  Dynamixel Compatibility
+               AX    MX      RX    XL-320    Pro
+ CM900          O      O      O        O      X
+ OpenCM9.04     O      O      O        O      X
+ **** OpenCM 485 EXP board is needed to use 4 pin Dynamixel and Pro Series ****
+ 
+ created 16 Nov 2012
+ by ROBOTIS CO,.LTD.
+ */
+ 
+/* Serial device defines for dxl bus */
+#define DXL_BUS_SERIAL1 1  //Dynamixel on Serial1(USART1)  <-OpenCM9.04
+#define DXL_BUS_SERIAL2 2  //Dynamixel on Serial2(USART2)  <-LN101,BT210
+#define DXL_BUS_SERIAL3 3  //Dynamixel on Serial3(USART3)  <-OpenCM 485EXP
+
+
+/* Control table defines */
+#define GOAL_POSITION 30
+#define PRESENT_POSITION 36
+#define R1 5
+#define R2 4
+#define R3 3
+#define low_pwm 240
+#define high_pwm 800
+#define middle_pwm 512
+
+char data;
+int p_data;
+
+Dynamixel Dxl(DXL_BUS_SERIAL3);
+
+void setup()
+{  
+  // Dynamixel 2.0 Baudrate -> 0: 9600, 1: 57600, 2: 115200, 3: 1Mbps 
+  Dxl.begin(3);
+  Dxl.jointMode(R1); //jointMode() is to use position mode
+  SerialUSB.begin();
+}
+
+void loop()
+{
+    Dxl.writeWord(R1, GOAL_POSITION, 512);
+    Dxl.writeWord(R2, GOAL_POSITION, 512);
+    Dxl.writeWord(R3, GOAL_POSITION, 512);
+    if(SerialUSB.available())
+  {    
+      data = SerialUSB.read();
+      p_data = data - '0';
+  
+      if (data == 0){
+        Dxl.writeWord(R2, GOAL_POSITION, 650);
+        delay(500);  
+        Dxl.writeWord(R2, GOAL_POSITION, 500);
+        delay(500);
+      }
+  
+      else if (data ==1 ){
+        Dxl.writeWord(R1, GOAL_POSITION, 300);
+      }
+      
+      else if (data == 2){
+        Dxl.writeWord(R1, GOAL_POSITION, 400);
+      }
+      
+      else if (data == 3){
+        Dxl.writeWord (R1, GOAL_POSITION, 500);
+      }
+       
+      else if (data == 4){
+        Dxl.writeWord (R1, GOAL_POSITION, 600);
+      }
+       
+      else if (data == 5){
+        Dxl.writeWord (R1, GOAL_POSITION, 800);
+      }
+  }
+
+}
