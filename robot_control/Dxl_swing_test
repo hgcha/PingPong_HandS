@@ -7,7 +7,8 @@
 #define ID_NUM 4
 /* Control table defines */
 #define GOAL_POSITION 30
-
+int a;
+int a_re;
 
 Dynamixel Dxl(DXL_BUS_SERIAL3);
 
@@ -16,19 +17,24 @@ void setup() {
   // Dynamixel 2.0 Baudrate -> 0: 9600, 1: 57600, 2: 115200, 3: 1Mbps 
   Dxl.begin(3);
   Dxl.jointMode(ID_NUM); //jointMode() is to use position mode
-  Serial.begin(9600);
+  SerialUSB.begin(9600);
 }
 
 void loop() {  
   
-  if (Serial.available())
+  if (SerialUSB.available())
   {
-      if (Serial.read()){
+    a = SerialUSB.read();
+    a_re = a - '0';
+      if (a == 1){
       Dxl.writeWord(ID_NUM, GOAL_POSITION, 300);
       delay(1000);
       Dxl.writeWord(ID_NUM, GOAL_POSITION, 512); 
       delay(1000);         
-    }
+      }
+      if (a == 0){
+      Dxl.writeWord(ID_NUM, GOAL_POSITION, 512); 
+      }
   }
 
 }
