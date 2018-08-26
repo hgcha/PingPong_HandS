@@ -65,19 +65,27 @@ void loop()
       }
   
       else if (p_data ==2 ){
-        Dxl.writeWord(R1, GOAL_POSITION, 300);
+        Dxl.writeWord(R1, GOAL_POSITION, 240);
+        Dxl.writeWord(R2, GOAL_POSITION, 350);
+        delay(500); 
+        Dxl.writeWord(R2, GOAL_POSITION, 500);
+        delay(500);
       }
       
       else if (p_data == 3){
-        Dxl.writeWord(R1, GOAL_POSITION, 400);
+        Dxl.writeWord(R1, GOAL_POSITION, 380);
+        Dxl.writeWord(R2, GOAL_POSITION, 350);
+        delay(500); 
+        Dxl.writeWord(R2, GOAL_POSITION, 500);
+        delay(500);
       }
       
       else if (p_data == 4){
-        Dxl.writeWord (R1, GOAL_POSITION, 500);
+        Dxl.writeWord (R1, GOAL_POSITION, 520);
       }
        
       else if (p_data == 5){
-        Dxl.writeWord (R1, GOAL_POSITION, 600);
+        Dxl.writeWord (R1, GOAL_POSITION, 660);
       }
        
       else if (p_data == 6){
