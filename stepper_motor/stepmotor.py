@@ -1,10 +1,12 @@
+
 import socket
 import wiringpi
 import time
 
-HOST = "169.254.7.25"
-PORT = 5000
-BUFSIZE = 1024
+#HOST = "169.254.7.25"
+HOST = "192.168.1.105"
+PORT = 5050
+BUFSIZE = 4
 ADDR = (HOST, PORT)
 
 server = socket.socket()
@@ -35,15 +37,20 @@ while True:
 		print("got connection from", addr_info)
 		wiringpi.digitalWrite(ENABLE_PIN, LOW)
 	else:
+#		client.send(b"hello")
 		total_data = client.recv(BUFSIZE)
 		total_data = total_data.decode()
+#		if total_data :
+#		print(int(total_data))
 		print(total_data)
-		print(type(total_data))
-		total_data = int(float(total_data))
+		total_data = int(total_data)
+		total_data = total_data - 4500
+#		total_data1 = total_data*(7.75)
+#		print(total_data)
+#		print(type(total_data))
 
 		if total_data > 0:
 			wiringpi.digitalWrite(DIR, HIGH)
-
 			for i in range(0, total_data):
 				wiringpi.digitalWrite(STEP, HIGH)
 				time.sleep(0.0005)
@@ -53,9 +60,10 @@ while True:
 		if total_data < 0:
 			total_data = (-1) * total_data
 			wiringpi.digitalWrite(DIR, LOW)
-
 			for i in range(0, total_data):
 				wiringpi.digitalWrite(STEP, HIGH)
 				time.sleep(0.0005)
 				wiringpi.digitalWrite(STEP, LOW)
 				time.sleep(0.0001)
+
+		time.sleep( 0.015 )
