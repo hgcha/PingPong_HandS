@@ -45,8 +45,6 @@ def cha2():
 
 				if cx <= 200:
 					a = 1
-				else:
-					a = 0
 				robot.write(str(a))
 
 				move_steps = int(cy * 4500 / 600 - current_position)
