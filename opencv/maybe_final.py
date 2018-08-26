@@ -22,8 +22,6 @@ robot = serial.Serial("/dev/ttyACM0", 9600)
 cap = cv2.VideoCapture(1)
 cap1 = cv2.VideoCapture(0)
 
-
-
 def cha2():
 	global client
 	global cap
