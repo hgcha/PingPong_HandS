@@ -42,11 +42,11 @@ def cha2():
 			cv2.circle(frame, (0, cy), 6, (255,0,0), 10)
 			cv2.circle(frame, (0, 20 * int(cy / 20)), 6, (0,255,0), 10)
 
-		if cx <= 200:
-			a = 1
-		else:
-			a = 0
-		robot.write(str(a))
+			if cx <= 200:
+				a = 1
+			else:
+				a = 0
+			robot.write(str(a))
 
 			move_steps = int(cy * 4500 / 600 - current_position)
 
