@@ -37,25 +37,26 @@ def cha2():
 			cnts = max(contours, key = lambda x: cv2.contourArea(x))
 
 			m = cv2.moments(cnts)
-			cx = int(m['m10']/m['m00'])
-			cy = int(m['m01']/m['m00'])
-			cv2.circle(frame, (0, cy), 6, (255,0,0), 10)
-			cv2.circle(frame, (0, 20 * int(cy / 20)), 6, (0,255,0), 10)
+			if m['m00'] > 0:
+				cx = int(m['m10']/m['m00'])
+				cy = int(m['m01']/m['m00'])
+				cv2.circle(frame, (0, cy), 6, (255,0,0), 10)
+				cv2.circle(frame, (0, 20 * int(cy / 20)), 6, (0,255,0), 10)
 
-			if cx <= 200:
-				a = 1
-			else:
-				a = 0
-			robot.write(str(a))
+				if cx <= 200:
+					a = 1
+				else:
+					a = 0
+				robot.write(str(a))
 
-			move_steps = int(cy * 4500 / 600 - current_position)
+				move_steps = int(cy * 4500 / 600 - current_position)
 
-			if (move_steps > 225) or (move_steps < -225):
-				quotient = int(move_steps / 225)
-				move_steps1 = 225 * quotient
-				print(move_steps1 + 4500)
-				client.send(str(move_steps1 + 4500).encode())
-				current_position = move_steps1 + current_position
+				if (move_steps > 225) or (move_steps < -225):
+					quotient = int(move_steps / 225)
+					move_steps1 = 225 * quotient
+					print(move_steps1 + 4500)
+					client.send(str(move_steps1 + 4500).encode())
+					current_position = move_steps1 + current_position
 			
 		key = cv2.waitKey(1)
 		if key == 27:
