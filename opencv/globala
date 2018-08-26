@@ -88,6 +88,7 @@ def cha3():
 	global cap1
 	global robot
 	global a
+  	global locka
 	while True:
 		stime1 = time.time()
 		ret1, frame1 = cap1.read()
