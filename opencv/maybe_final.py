@@ -42,23 +42,17 @@ def cha2():
 			cv2.circle(frame, (0, cy), 6, (255,0,0), 10)
 			cv2.circle(frame, (0, 20 * int(cy / 20)), 6, (0,255,0), 10)
 
-			if cx in range(0, 200):
-				a = 6
-			else:
-				a = 7
-			robot.write(str(a))
+		if cx <= 200:
+			a = 1
+		else:
+			a = 0
+		robot.write(str(a))
 
 			move_steps = int(cy * 4500 / 600 - current_position)
 
-			if (move_steps > 225) :
+			if (move_steps > 225) or (move_steps < -225):
 				quotient = int(move_steps / 225)
 				move_steps1 = 225 * quotient
-				print(move_steps1 + 4500)
-				client.send(str(move_steps1 + 4500).encode())
-				current_position = move_steps1 + current_position
-			elif (move_steps < -225):
-				quotient = int(move_steps / 225) + 1
-				move_steps1 = 230 * quotient
 				print(move_steps1 + 4500)
 				client.send(str(move_steps1 + 4500).encode())
 				current_position = move_steps1 + current_position
@@ -89,7 +83,7 @@ def cha3():
 			print("Cam1 Error")
 
 		frame1 = cv2.resize(frame1, (800, 500))
-		frame1 = frame1[0:360, 300: 500]
+		frame1 = frame1[0:350, 300: 500]
 		hsv = cv2.cvtColor(frame1, cv2.COLOR_BGR2HSV)
 		orange = cv2.inRange(hsv, np.array([10, 90, 50]), np.array([20, 255, 255]))
 		contours1 = cv2.findContours(orange.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
@@ -103,19 +97,9 @@ def cha3():
 				cv2.circle(frame1, (cx1, cz), 7, (0,0,255), 10)
 				cv2.circle(frame1, (0, cz), 6, (255,0,0), 10)
 
-				if 0 <= cz < 60:
-					b = 5
-				elif 60 <= cz < 120:
-					b = 4
-				elif 120 <= cz < 180:
-					b = 3
-				elif 180 <= cz < 240:
-					b = 2
-				elif 240 <= cz < 360:
-					b = 1
-				robot.write(str(b))
-				# print(a)
-			
+				send_z = int(cz / 70) + 2
+				robot.write(str(send_z))
+
 		key1 = cv2.waitKey(1)
 		if key1 == 27:
 			break
@@ -124,7 +108,6 @@ def cha3():
 		t_text1 = str(t_time1)
 		cv2.putText(frame1,t_text1, (700, 45), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
 		cv2.imshow("2", frame1)
-		# time.sleep(0.1)
 
 	cap1.release()
 	cv2.destroyAllWindows()
