@@ -1,22 +1,8 @@
 import cv2
 import numpy as np
-import socket
 import time
-import serial
 
-client = socket.socket()
-HOST = "169.254.7.25"
-#HOST = "192.168.1.105"
-PORT = 5050
-BUFSIZE = 4
-ADDR = (HOST, PORT)
-
-client.connect(ADDR)
-print('Connected to', HOST)
-
-robot = serial.Serial("/dev/ttyUSB0", 9600)
-
-current_position = 2300
+current_position = 2250
 firstFrame = None
 
 cap = cv2.VideoCapture(1)
@@ -26,10 +12,10 @@ while True:
 	ret, frame = cap.read()
 
 	if ret is False:
-		print("Cam Error")
+		print("Cam2 Error")
 
 	frame = cv2.resize(frame, (800, 600))
-	cv2.line(frame, (0, 300), (800, 300), (0,0,255), 5)
+	# cv2.line(frame, (0, 300), (800, 300), (0,0,255), 5)
 	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 	gray = cv2.GaussianBlur(gray, (31, 31), 0)
 
@@ -52,29 +38,37 @@ while True:
 		cv2.circle(frame, (0, cy), 6, (255,0,0), 10)
 		cv2.circle(frame, (0, 20 * int(cy / 20)), 6, (0,255,0), 10)
 
-		if cx in range(0, 150):
+		if cx <= 200:
 			a = 1
 		else:
 			a = 0
 		robot.write(str(a))
 
-		move_steps = int(cy * 4600 / 600 - current_position)
+		move_steps = int(cy * 4500 / 600 - current_position)
 
-		if move_steps > 460:
-			quotient = int(move_steps / 230)
-			print("1")
-			move_steps1 = 460 * quotient
-			print(move_steps1 + 4600)
-			client.send(str(move_steps1 + 4600).encode())
-			current_position = move_steps1 + current_position
-		elif move_steps < -460:
-			quotient = int(move_steps / 230) + 1
-			print("-1")
-			move_steps1 = 460 * quotient
-			print(move_steps1 + 4600)
-			client.send(str(move_steps1 + 4600).encode())
-			current_position = move_steps1 + current_position
+# 		if (move_steps > 225) :
+# 			quotient = int(move_steps / 225)
+# 			print(quotient)
+# 			move_steps1 = 225 * quotient
+# #			print(move_steps1 + 4500)
+# #			client.send(str(move_steps1 + 4500).encode())
+# 			current_position = move_steps1 + current_position
+# 		elif (move_steps < -225):
+# 			quotient = int(move_steps / 225) + 1
+# 			print(quotient)
+# 			move_steps1 = 230 * quotient
+# 			#print(move_steps1 + 4500)
+# 			# client.send(str(move_steps1 + 4500).encode())
+# 			current_position = move_steps1 + current_position
 
+		if (move_steps > 225) or (move_steps < -225):
+			quotient = int(move_steps / 225)
+			#print(quotient)
+			move_steps1 = 225 * quotient
+			# print(move_steps1 + 4500)
+			# client.send(str(move_steps1 + 4500).encode())
+			current_position = move_steps1 + current_position
+		
 	key = cv2.waitKey(1)
 	if key == 27:
 		break
@@ -85,7 +79,6 @@ while True:
 	t_text = str(t_time)
 	cv2.putText(frame,t_text, (700, 45), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
 	cv2.imshow("1", frame)
-	cv2.imshow("2", frameDelta)
 
 cap.release()
 cv2.destroyAllWindows()
