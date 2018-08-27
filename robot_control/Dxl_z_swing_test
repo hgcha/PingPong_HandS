@@ -44,6 +44,7 @@ void setup()
   // Dynamixel 2.0 Baudrate -> 0: 9600, 1: 57600, 2: 115200, 3: 1Mbps 
   Dxl.begin(3);
   Dxl.jointMode(R1); //jointMode() is to use position mode
+ Dxl.writeWord(R3, GOAL_POSITION, 512);
   SerialUSB.begin();
 }
 
@@ -51,46 +52,85 @@ void loop()
 {
 //    Dxl.writeWord(R1, GOAL_POSITION, 512);
 //    Dxl.writeWord(R2, GOAL_POSITION, 512);
-    Dxl.writeWord(R3, GOAL_POSITION, 512);
+//    Dxl.writeWord(R3, GOAL_POSITION, 512);
     if(SerialUSB.available())
   {    
       data = SerialUSB.read();
-      p_data = data - '0';
-  
-      if (p_data == 1){
-        Dxl.writeWord(R2, GOAL_POSITION, 650);
-        delay(500);  
-        Dxl.writeWord(R2, GOAL_POSITION, 500);
-        delay(500);
-      }
-  
-      else if (p_data ==2 ){
+
+      if (data == 'a'){
         Dxl.writeWord(R1, GOAL_POSITION, 240);
-        Dxl.writeWord(R2, GOAL_POSITION, 350);
-        delay(500); 
-        Dxl.writeWord(R2, GOAL_POSITION, 500);
-        delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
       }
       
-      else if (p_data == 3){
+      else if (data == 'b'){
         Dxl.writeWord(R1, GOAL_POSITION, 380);
-        Dxl.writeWord(R2, GOAL_POSITION, 350);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
+      }
+      
+      else if (data == 'c'){
+        Dxl.writeWord(R1, GOAL_POSITION, 580);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
+      }
+      
+      else if (data == 'd'){
+        Dxl.writeWord(R1, GOAL_POSITION, 700);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
+      }
+      
+      else if (data == 'e'){
+        Dxl.writeWord(R1, GOAL_POSITION, 850);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
+      }
+
+//swing  
+      else if (data == 'f' ){
+        Dxl.writeWord(R1, GOAL_POSITION, 240);
+        Dxl.writeWord (R3, GOAL_POSITION, 512);
+        delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 480); //
         delay(500); 
-        Dxl.writeWord(R2, GOAL_POSITION, 500);
+        Dxl.writeWord(R2, GOAL_POSITION, 250); //
         delay(500);
       }
       
-      else if (p_data == 4){
-        Dxl.writeWord (R1, GOAL_POSITION, 520);
+      else if (p_data == 'g'){
+        Dxl.writeWord(R1, GOAL_POSITION, 380);
+        Dxl.writeWord (R3, GOAL_POSITION, 412); 
+        delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 480);
+        delay(500); 
+        Dxl.writeWord(R2, GOAL_POSITION, 350);
+        delay(500);
+      }
+      
+      else if (p_data == 'h'){
+        Dxl.writeWord (R1, GOAL_POSITION, 580);
+        Dxl.writeWord (R3, GOAL_POSITION, 410);        
+        delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 680);
+        delay(500); 
+        Dxl.writeWord(R2, GOAL_POSITION, 450);
+        delay(500);      
+    }
+       
+      else if (p_data == 'i'){
+        Dxl.writeWord (R1, GOAL_POSITION, 700);
+        delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 700);
+        delay(500); 
+        Dxl.writeWord(R2, GOAL_POSITION, 510);
+        delay(500);
       }
        
-      else if (p_data == 5){
-        Dxl.writeWord (R1, GOAL_POSITION, 660);
-      }
-       
-      else if (p_data == 6){
-        Dxl.writeWord (R1, GOAL_POSITION, 800);
-      }
+      else if (p_data == 'j'){
+        Dxl.writeWord (R1, GOAL_POSITION, 850);
+        delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 700);
+        delay(500); 
+        Dxl.writeWord(R2, GOAL_POSITION, 480);
+        delay(500);
+      
+    }
       
       else{
         Dxl.writeWord(R1, GOAL_POSITION, 512);
