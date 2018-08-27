@@ -59,7 +59,7 @@ void loop()
  
 
 //swing  
-      else if (data == 'f' ){
+      if (data == 'f' ){
         
         Dxl.writeWord(R1, GOAL_POSITION, 240);
    
