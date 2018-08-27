@@ -1,0 +1,134 @@
+#include <stdio.h>
+/* Dynamixel Basic Position Control Example
+ 
+ Turns left the dynamixel , then turn right for one second,
+ repeatedly.
+ 
+                   Compatibility
+ CM900                  O
+ OpenCM9.04             O
+ 
+                  Dynamixel Compatibility
+               AX    MX      RX    XL-320    Pro
+ CM900          O      O      O        O      X
+ OpenCM9.04     O      O      O        O      X
+ **** OpenCM 485 EXP board is needed to use 4 pin Dynamixel and Pro Series ****
+ 
+ created 16 Nov 2012
+ by ROBOTIS CO,.LTD.
+ */
+ 
+/* Serial device defines for dxl bus */
+#define DXL_BUS_SERIAL1 1  //Dynamixel on Serial1(USART1)  <-OpenCM9.04
+#define DXL_BUS_SERIAL2 2  //Dynamixel on Serial2(USART2)  <-LN101,BT210
+#define DXL_BUS_SERIAL3 3  //Dynamixel on Serial3(USART3)  <-OpenCM 485EXP
+
+
+/* Control table defines */
+#define GOAL_POSITION 30
+#define PRESENT_POSITION 36
+#define R1 5
+#define R2 4
+#define R3 3
+#define low_pwm 240
+#define high_pwm 800
+#define middle_pwm 512
+
+char data;
+
+Dynamixel Dxl(DXL_BUS_SERIAL3);
+
+void setup()
+{  
+  // Dynamixel 2.0 Baudrate -> 0: 9600, 1: 57600, 2: 115200, 3: 1Mbps 
+  Dxl.begin(3);
+  Dxl.jointMode(R1); //jointMode() is to use position mode
+ Dxl.writeWord(R3, GOAL_POSITION, 512);
+  SerialUSB.begin();
+}
+
+void loop()
+{
+//    Dxl.writeWord(R1, GOAL_POSITION, 512);
+//    Dxl.writeWord(R2, GOAL_POSITION, 512);
+//    Dxl.writeWord(R3, GOAL_POSITION, 512);
+    if(SerialUSB.available())
+  {    
+      data = SerialUSB.read();
+
+ 
+
+//swing  
+      else if (data == 'f' ){
+        
+        Dxl.writeWord(R1, GOAL_POSITION, 240);
+   
+        Dxl.writeWord (R3, GOAL_POSITION, 512);
+       // delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 480); //
+        delay(250); 
+        Dxl.writeWord(R2, GOAL_POSITION, 250); //
+        //delay(500);
+        delay(250); 
+        Dxl.writeWord(R1, GOAL_POSITION, 580);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
+      }
+      
+      else if (data == 'g'){
+        Dxl.writeWord(R1, GOAL_POSITION, 380);
+        Dxl.writeWord (R3, GOAL_POSITION, 412); 
+        //delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 480);
+        delay(250); 
+        Dxl.writeWord(R2, GOAL_POSITION, 350);
+        //delay(500);
+        delay(250); 
+        Dxl.writeWord(R1, GOAL_POSITION, 580);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);        
+      }
+      
+      else if (data == 'h'){
+        Dxl.writeWord (R1, GOAL_POSITION, 580);
+        Dxl.writeWord (R3, GOAL_POSITION, 410);        
+        //delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 680);
+        delay(250); 
+        Dxl.writeWord(R2, GOAL_POSITION, 450);
+        //delay(500);      
+        delay(250); 
+        Dxl.writeWord(R1, GOAL_POSITION, 580);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
+    }
+       
+      else if (data == 'i'){
+        Dxl.writeWord (R1, GOAL_POSITION, 700);
+        //delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 700);
+        delay(250); 
+        Dxl.writeWord(R2, GOAL_POSITION, 510);
+        //delay(500);
+        delay(250); 
+        Dxl.writeWord(R1, GOAL_POSITION, 580);
+        Dxl.writeWord(R2, GOAL_POSITION, 512); 
+      }
+       
+      else if (data == 'j'){
+        Dxl.writeWord (R1, GOAL_POSITION, 850);
+        //delay(500);
+        Dxl.writeWord(R2, GOAL_POSITION, 700);
+        delay(250); 
+        Dxl.writeWord(R2, GOAL_POSITION, 480);
+        //delay(500);
+        delay(250); 
+        Dxl.writeWord(R1, GOAL_POSITION, 580);
+        Dxl.writeWord(R2, GOAL_POSITION, 512);
+  
+        
+    }
+      
+      else{
+        Dxl.writeWord(R1, GOAL_POSITION, 512);
+      }
+  }
+
+}
