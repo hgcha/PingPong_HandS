@@ -10,4 +10,4 @@
 <img width= "50%" src="https://github.com/hgcha/PingPong_HandS/blob/master/photos/pingpong_2.jpg"/>
 
 # Awards
-OO대학교 창의융합경진대회 탁구 로봇 제작부문 최우수상
+2018년 제2회 GIST 창의융합경진대회 탁구 로봇 제작부문 국립광주과학관장상(최우수)
